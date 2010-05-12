@@ -5,13 +5,17 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.7
+ * @version 0.9b
  * @date	May 12, 2010
  */
 Ext.test.session = {
     testCaseCount : 0
   // create a MixedCollection of instancied TestSuites
   , ts : new Ext.util.MixedCollection() 
+  , rootNode : new Ext.tree.TreeNode({
+          text: 'My Tests Session'
+        , expanded: true
+  })
   // Let's the action begin
   , boot : function() {
       Ext.onReady(Ext.test.session.init,this);
@@ -26,18 +30,14 @@ Ext.test.session = {
       var testViewport = new Ext.Viewport({
           layout: 'border'
         , items: [{
-                xtype : 'grid'
+                xtype : 'columntree'
               , region : 'center'
-              , id : 'test-grid'
-              , autoExpandColumn : 'testName'
-              , view : new Ext.grid.GroupingView({
-                    forceFit       : true
-                  , startCollapsed : true
-              })
+              , header : true
+              , id : 'test-tree'
               , height : 350
-              , store : Ext.test.Store
-              , stripeRows : true
-              , tbar: [
+              , autoScroll : true
+              , rootVisible : false
+              , bbar: [
                   new Ext.Button({
                         text    : 'Start'
                       , iconCls : 'x-tbar-page-next'
@@ -50,49 +50,18 @@ Ext.test.session = {
                    id   : 'progress-bar'
                   , text : 'Ready'
                   , width : 500
-                })
-
+              })
               ]
+              , root:  this.rootNode
               , columns : [{
-                    dataIndex     : 'testSuite'
-                  , header        : 'Test Suite'
-                  , hidden        : true
-                  , id            : 'testSuite'
-                  , width         : 300
-                  , groupRenderer : function(newValue, unused, rowRecord, rowIndex, colIndex, dataStore){
-                      var groupCls = '';
-                      var pending = false;
-                      var testCount = 0;
-                      var testPassed = 0;
-                      dataStore.each(function(rec) {
-                          if (newValue === rec.data.testSuite) {
-                              testCount++;
-                              if (!rec.data.testResult) {
-                                  if (rec.data.testStatus === 'Pending...' || rec.data.testStatus === 'Running...' ) {
-                                      pending = true;
-                              }
-                            } else if (rec.data.testStatus === 'Test failed!')  {
-                                      groupCls = 'failed-test-group';
-                            }
-                            if (rec.data.testStatus === 'Test passed.'){
-                              testPassed++; 
-                            }
-                          }
-                      },this);
-
-                      if (!pending && groupCls !== 'failed-test-group') {
-                          groupCls = 'passed-test-group';
-                      }
-                      return String.format('<span class="{0}">&nbsp;{1}&nbsp;({2}/{3})</span>', groupCls, newValue, testPassed, testCount);
-                  }
-                },{
-                    dataIndex : 'testName'
+                    dataIndex : 'name'
                   , header    : 'Name'
-                  , id        :'testName'
+                  , id        : 'name'
+                  , width     : 300
                 },{
-                    dataIndex : 'testStatus'
-                  , header    : 'Test Status'
-                  , id        : 'testStatus'
+                    dataIndex : 'state'
+                  , header    : 'State'
+                  , id        : 'state'
                   , renderer  : function(val, cell, record) {
                          var color = '#000';
                           if (val == 'Test passed.') {
@@ -103,17 +72,16 @@ Ext.test.session = {
                           }
                           return '<span style="color: '+color+'; font-weight: bold;">' + val + '</span>';
                   }
-                  , width: 60
+                  , width     : 200
                 },{
-                    dataIndex: 'testResult'
-                  , header: 'Results'
-                  , id:'testResult'
-                  , width: 100
+                    dataIndex : 'results'
+                  , header    : 'Results'
+                  , id        : 'results'
+                  , width     : 200
                 },{
-                    dataIndex : 'testDetails'
+                    dataIndex : 'details'
+                  , id        : 'details'
                   , header    : 'Details'
-                  , id        : 'testDetails'
-                  ,width      : 200
               }]
           },{
               xtype       : 'panel'
@@ -147,14 +115,37 @@ Ext.test.session = {
   }
 
   // Reset all tests
-  , resetRecords : function(){
-      var g = Ext.getCmp('test-grid');
-      g.store.each(function(r){
-        r.data['testStatus'] = 'Pending...';
-        delete r.data['testResult'];
-        delete r.data['testDetails'];
-      });
-      g.view.refresh();
+  , resetNodes : function(){
+      var attr,
+          nattr,
+          p;
+      this.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testCase'){
+          node.attributes['results'] = '';
+          node.attributes['details'] = '';
+          node.attributes['state'] = 'Pending...';
+          nattr = Ext.apply({},node.attributes);
+          p = node.parentNode;
+          var expand = p.isExpanded();
+          p.replaceChild(new Ext.tree.TreeNode(nattr), node);
+          node.destroy();
+          if (expand){
+            p.expand(); 
+          }
+        }
+      }, this);
+  }
+  , getTestCaseCount : function(){
+    var attr,
+        count = 0;
+    this.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testCase'){
+          count++;
+        }
+     }, this);
+     return count;
   }
   // Handle Start Button Click
   , onStart : function() {
@@ -162,63 +153,64 @@ Ext.test.session = {
       sbut.disable();
       var pbar = Ext.getCmp('progress-bar');
       this.testCaseCount = 0;
-      this.resetRecords();
+      this.resetNodes();
       this.initTestRunner();
   }
   // initialize test runner
   , initTestRunner : function() {
 	    Y.Test.Runner.clear();
-	    var testSuites = [];
-      Ext.test.Store.each(function(record){
-        var testSuiteName = record.get('testSuite');
-        if (testSuites.indexOf(testSuiteName) == -1){
-          var testSuite = this.ts.get(testSuiteName);
-          Y.Test.Runner.add((testSuite));
-          testSuites.push(testSuiteName);
-        }
-	    },this);
+      this.ts.sort('ASC');
+      this.ts.each(function(t){
+        Y.Test.Runner.add((t));
+      },this);
 	    Y.Test.Runner.run();   
   }
   // Handle test runner events
   , onTestRunnerEvent : function(event){
-      var rec, 
+      var node, 
           res;
       
       switch(event.type){
         case "fail":
-            rec = Ext.test.session.getTestRecord(event.testCase.name);
-            rec.set('testStatus', 'Test failed!');
-            var rd = rec.get('testDetails');
+            node = Ext.test.session.getTestCaseNode(event.testCase.name);
+            node.attributes['state'] =  'Test failed!';
+            var rd = node.attributes['details'];
             var details = String.format('{0}{1}: {2}<br>', rd || '', event.testName, event.error.toString());
-            rec.set('testDetails', details); 
-            rec.commit();
+            node.attributes['details'] = details; 
             break;
         case "testcasebegin":
-            rec = Ext.test.session.getTestRecord(event.testCase.name);
-            rec.set('testStatus', 'Running...');
-            rec.commit();
+            node = Ext.test.session.getTestCaseNode(event.testCase.name);
+            node.attributes['state'] =  'Running...';
             break;
         case "testcasecomplete":
             Ext.test.session.testCaseCount++;
-            rec = Ext.test.session.getTestRecord(event.testCase.name);
-            var count = Ext.test.Store.getCount();
+            node = Ext.test.session.getTestCaseNode(event.testCase.name);
+            var count = Ext.test.session.getTestCaseCount();
             var pbar = Ext.getCmp('progress-bar');
             var c = Ext.test.session.testCaseCount/count;
             pbar.updateProgress(c, Math.round(100*c)+'% completed...');
             res = event.results;
             if (res.failed === 0) {
-              rec.set('testStatus', 'Test passed.');
+              node.attributes['state'] = 'Test passed.'
             } 
-            rec.set('testResult', String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored));
-            rec.commit();
-            Ext.getCmp('test-grid').view.refresh();
+            node.attributes['results'] = String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored);
             break;
-            
         case "complete":
             var pbar = Ext.getCmp('progress-bar');
             pbar.updateProgress(1, '100% completed...');
             Ext.getCmp('start-button').enable();
             break;
+      }
+      if (node){
+        var attr = Ext.apply({},node.attributes);
+        var p = node.parentNode;
+        var expand = p.isExpanded();
+        p.suspendEvents();
+        p.replaceChild(new Ext.tree.TreeNode(attr), node);
+        node.destroy();
+        if (expand){
+          p.expand(); 
+        }
       }
   }
   /*
@@ -258,6 +250,39 @@ Ext.test.session = {
       if (this.ts.indexOf(name) == -1){
         Ext.test.session.ts.add(name, testSuite); 
       }
+      var n = new Ext.tree.TreeNode({
+           name      : name
+         , uiProvider: Ext.ux.tree.ColumnNodeUI
+         , type      : 'testSuite'
+         , state     : ''
+         , results   : ''
+         , details   : ''
+      });
+      this.rootNode.appendChild(n);
+  }
+  // Add a Testcase to tree
+  , registerTestCase : function(testCase, testSuite){
+      var n = new Ext.tree.TreeNode({
+            name       : testCase.name
+          , uiProvider : Ext.ux.tree.ColumnNodeUI
+          , type       : 'testCase'
+          , state      : 'Pending...' 
+          , results    : ''
+          , details    : ''
+      });
+      var testSuiteNode, 
+          attr,
+          name = testSuite.name;
+      this.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testSuite' && attr['name'] == name){
+          testSuiteNode = node;
+          return false;
+        }
+      }, this);
+      if (testSuiteNode){
+        testSuiteNode.appendChild(n);
+      }
   }
   /**
    * Find a Test Case
@@ -277,20 +302,18 @@ Ext.test.session = {
           }
         }
   }
-  // Add a Record containing testCase information
-  , addRecord: function(testCase, testSuite){
-      testSuite = testSuite || this;
-      
-      Ext.test.Store.addSorted(new Ext.test.Record({
-         testName    : testCase.name
-       , testSuite   : testSuite.name
-       , testStatus  : 'Pending...' 
-      }));
-  }
   // Retrieve a record by testName
-  , getTestRecord: function(testName){
-      var idx = Ext.test.Store.findExact('testName',testName);
-      return Ext.test.Store.getAt(idx);
+  , getTestCaseNode: function(testName){
+      var n,
+          attr;
+      Ext.test.session.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testCase' && attr['name'] == testName){
+          n = node;
+          return false;
+        }
+      }, this);
+      return n;
   }
   /*
    * Add a testCase to Ext.test.session

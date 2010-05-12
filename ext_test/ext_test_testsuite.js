@@ -3,15 +3,15 @@
  * TestSuite class
  * @extend Y.Test.Case
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.7
+ * @version 0.9b
  * @date	May 12, 2010
  */
 Ext.test.testSuite = Ext.extend(Y.Test.Suite,{
     defaults: {}
   , constructor : function(){
       Ext.test.testSuite.superclass.constructor.apply(this, arguments);
-      this.initTestCases(); 
       Ext.test.session.registerTestSuite(this);
+      this.initTestCases(); 
   }
   // add testCases to testSuite
   , initTestCases : function() {
@@ -36,6 +36,6 @@ Ext.test.testSuite = Ext.extend(Y.Test.Suite,{
          t = new Ext.test.testCase(testCase);
       }
       Ext.test.testSuite.superclass.add.call(this, t);
-      Ext.test.session.addRecord(testCase, this);
+      Ext.test.session.registerTestCase(testCase, this);
   }
 });
