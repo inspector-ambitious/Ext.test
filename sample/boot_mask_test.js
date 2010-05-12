@@ -1,29 +1,98 @@
+new Ext.test.testSuite({
+	 /* testSuite name */
+	  name : 'Ext.ux.bootMask Sample 1'
+	 /* This defaults function are available for all TestCase */
+	, defaults : {
+			/**
+			  * The setUp method create a div in the body allowing to render
+			  * bootMask into. This method is run before each test.
+			  */
+			  setUp : function() {
+		      this.el = Ext.getBody().createChild({tag: 'div'});
+		      this.bootMask = new Ext.ux.bootMask(this.el,{
+			      msg : 'Test'
+		      });
+		  }   
+		 /**
+		  * The tearDown method is run after each test. It destroy the element 
+		  * and bootMask instancied in setUp.
+		  */
+		  , tearDown : function() {
+			    this.bootMask.destroy();
+		      Ext.destroy(this.el);
+		  }
+   }
+   /* Here the testCases */
+  , testCases : [{
+		/* testCase name */
+		  name : 'Test defaultValues'
+		 /* Test default class values */
+		, testDefaultValues : function() {
+        Y.Assert.areEqual('11000', this.bootMask.zIndex, 'Test zIndex default value');
+    }
+	},{
+		/* testCase name */
+		  name : 'onBeforeLoad'
+		/* Test if the setted zIndex after a bootMask show is valid */  
+    , testZindex : function(){
+	      this.bootMask.show();
+	      var mask = this.el.child('.ext-el-mask');
+	      var zindex = mask.getStyle('z-index');
+	      Y.Assert.areSame(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
+    }
+    /* Test that mask is not created if bootMask is disabled */
+    , testDisable : function(){
+			  this.bootMask.disable();
+			  this.bootMask.show();
+			  var mask = this.el.child('.ext-el-mask');
+			  Y.Assert.isNull(mask, 'Test that mask is not created when Ext.ux.bootMask is disabled');
+    }
+	}]
+});
+
+
 new Ext.test.testCase({
+  // the name of the testCase
    name : 'Test defaultValues, zIndex and disable'
- , testSuiteName : 'Ext.ux.bootMask'
- , setUp : function() {
+  // Important automatically register testCase in Ext.test.session
+  , autoReg : true
+  // the testSuite is created if it doesn't exist
+  , testSuiteName : 'Ext.ux.bootMask Sample 2'
+  /**
+   * The setUp method create a div in the body allowing to render
+   * bootMask into. This method is run before each test.
+   */
+  , setUp : function() {
      this.el = Ext.getBody().createChild({tag: 'div'});
      this.bootMask = new Ext.ux.bootMask(this.el,{
-	   msg: 'Test'
+				msg: 'Test'
      });
- }    
- , tearDown : function() {
-	 this.bootMask.destroy();
+  }    
+  /**
+   * The tearDown method is run after each test. It destroy the element 
+   * and bootMask instancied in setUp.
+   */
+  , tearDown : function() {
+	   this.bootMask.destroy();
      Ext.destroy(this.el);
- }
+  }
+  /* Test default class values */
   , testDefaultValues: function() {
-     Y.Assert.areEqual('11000', this.bootMask.zIndex, 'Test zIndex default value');
- }
- , testZindex : function(){
-     this.bootMask.show();
-     var mask = this.el.child('.ext-el-mask');
-     var zindex = mask.getStyle('z-index');
-     Y.Assert.areSame(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
+      Y.Assert.areEqual('11000', this.bootMask.zIndex, 'Test zIndex default value');
   }
+  /* Test if the setted zIndex after a bootMask show is valid */
+  , testZindex : function(){
+      this.bootMask.show();
+      var mask = this.el.child('.ext-el-mask');
+      var zindex = mask.getStyle('z-index');
+      Y.Assert.areSame(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
+  }
+  /* Test that mask is not created if bootMask is disabled */
   , testDisable : function(){
-	 this.bootMask.disable();
-	 this.bootMask.show();
-	 var mask = this.el.child('.ext-el-mask');
-	 Y.Assert.isNull(mask, 'Test that mask is not created when Ext.ux.bootMask is disabled');
+	    this.bootMask.disable();
+	    this.bootMask.show();
+	    var mask = this.el.child('.ext-el-mask');
+	    Y.Assert.isNull(mask, 'Test that mask is not created when Ext.ux.bootMask is disabled');
   }
-}).register();
+}); 
+

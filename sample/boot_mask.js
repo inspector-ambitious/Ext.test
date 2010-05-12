@@ -5,8 +5,8 @@ Ext.ns('Ext.ux');
  * @extends Ext.LoadMask
  */
 Ext.ux.bootMask = Ext.extend(Ext.LoadMask,{
-   /**
-     * @cfg {Number} zIndex (defaults to 11000) the mask zIndex value
+    /**
+     * @cfg {String} zIndex (defaults to 11000) the mask zIndex value
      */
      zIndex: '11000'
     // add zIndex support to mask

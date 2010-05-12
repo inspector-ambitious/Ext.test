@@ -5,8 +5,8 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.6
- * @date	May 11, 2010
+ * @version 0.7
+ * @date	May 12, 2010
  */
 Ext.test.session = {
     testCaseCount : 0
@@ -148,78 +148,77 @@ Ext.test.session = {
 
   // Reset all tests
   , resetRecords : function(){
-    var g = Ext.getCmp('test-grid');
-    g.store.each(function(r){
-       r.data['testStatus'] = 'Pending...';
-       delete r.data['testResult'];
-       delete r.data['testDetails'];
-    });
-    g.view.refresh();
+      var g = Ext.getCmp('test-grid');
+      g.store.each(function(r){
+        r.data['testStatus'] = 'Pending...';
+        delete r.data['testResult'];
+        delete r.data['testDetails'];
+      });
+      g.view.refresh();
   }
   // Handle Start Button Click
   , onStart : function() {
-	  var sbut = Ext.getCmp('start-button');
-	  sbut.disable();
-	  var pbar = Ext.getCmp('progress-bar');
-	  this.testCaseCount = 0;
-	  this.resetRecords();
-	  this.initTestRunner();
+      var sbut = Ext.getCmp('start-button');
+      sbut.disable();
+      var pbar = Ext.getCmp('progress-bar');
+      this.testCaseCount = 0;
+      this.resetRecords();
+      this.initTestRunner();
   }
   // initialize test runner
   , initTestRunner : function() {
-	 Y.Test.Runner.clear();
-	 var testSuites = [];
-     Ext.test.Store.each(function(record){
-		var testSuiteName = record.get('testSuite');
-		if (testSuites.indexOf(testSuiteName) == -1){
-			var testSuite = this.ts.get(testSuiteName);
-			Y.Test.Runner.add((testSuite));
-			testSuites.push(testSuiteName);
-	    }
-	 },this);
-	 Y.Test.Runner.run();   
+	    Y.Test.Runner.clear();
+	    var testSuites = [];
+      Ext.test.Store.each(function(record){
+        var testSuiteName = record.get('testSuite');
+        if (testSuites.indexOf(testSuiteName) == -1){
+          var testSuite = this.ts.get(testSuiteName);
+          Y.Test.Runner.add((testSuite));
+          testSuites.push(testSuiteName);
+        }
+	    },this);
+	    Y.Test.Runner.run();   
   }
   // Handle test runner events
   , onTestRunnerEvent : function(event){
-    var rec, res;
-     switch(event.type){
-		 
-          case "fail":
-              rec = Ext.test.session.getTestRecord(event.testCase.name);
-              rec.set('testStatus', 'Test failed!');
-              var rd = rec.get('testDetails');
-              var details = String.format('{0}{1}: {2}<br>', rd || '', event.testName, event.error.toString());
-              rec.set('testDetails', details); 
-              rec.commit();
-              break;
- 
-          case "testcasebegin":
-              rec = Ext.test.session.getTestRecord(event.testCase.name);
-              rec.set('testStatus', 'Running...');
-              rec.commit();
-              break;
-           
-          case "testcasecomplete":
-              Ext.test.session.testCaseCount++;
-              rec = Ext.test.session.getTestRecord(event.testCase.name);
-              var count = Ext.test.Store.getCount();
-              var pbar = Ext.getCmp('progress-bar');
-              var c = Ext.test.session.testCaseCount/count;
-              pbar.updateProgress(c, Math.round(100*c)+'% completed...');
-              res = event.results;
-              if (res.failed === 0) {
-                rec.set('testStatus', 'Test passed.');
-              } 
-              rec.set('testResult', String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored));
-              rec.commit();
-              Ext.getCmp('test-grid').view.refresh();
-              break;
-              
-          case "complete":
-              var pbar = Ext.getCmp('progress-bar');
-              pbar.updateProgress(1, '100% completed...');
-              Ext.getCmp('start-button').enable();
-              break;
+      var rec, 
+          res;
+      
+      switch(event.type){
+        case "fail":
+            rec = Ext.test.session.getTestRecord(event.testCase.name);
+            rec.set('testStatus', 'Test failed!');
+            var rd = rec.get('testDetails');
+            var details = String.format('{0}{1}: {2}<br>', rd || '', event.testName, event.error.toString());
+            rec.set('testDetails', details); 
+            rec.commit();
+            break;
+        case "testcasebegin":
+            rec = Ext.test.session.getTestRecord(event.testCase.name);
+            rec.set('testStatus', 'Running...');
+            rec.commit();
+            break;
+        case "testcasecomplete":
+            Ext.test.session.testCaseCount++;
+            rec = Ext.test.session.getTestRecord(event.testCase.name);
+            var count = Ext.test.Store.getCount();
+            var pbar = Ext.getCmp('progress-bar');
+            var c = Ext.test.session.testCaseCount/count;
+            pbar.updateProgress(c, Math.round(100*c)+'% completed...');
+            res = event.results;
+            if (res.failed === 0) {
+              rec.set('testStatus', 'Test passed.');
+            } 
+            rec.set('testResult', String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored));
+            rec.commit();
+            Ext.getCmp('test-grid').view.refresh();
+            break;
+            
+        case "complete":
+            var pbar = Ext.getCmp('progress-bar');
+            pbar.updateProgress(1, '100% completed...');
+            Ext.getCmp('start-button').enable();
+            break;
       }
   }
   /*
@@ -228,51 +227,58 @@ Ext.test.session = {
    * @return {Y.Test.Suite} return Y.Test.Suite
    */
   , getSuite : function(testSuiteName) {
-    var t = this.findTestSuite(testSuiteName);
-    if (!t){
-      t = this.createTestSuite(testSuiteName);
-    }
-     return t;
+      var t = this.findTestSuite(testSuiteName);
+      if (!t){
+        t = this.createTestSuite(testSuiteName);
+      }
+      return t;
   }
-  /*
+  /**
    * Create a Test Suite
    * @param {String} testSuiteName The name of the TestSuite
    * @return {Y.Test.Suite} return Y.Test.Suite created
    */
   , createTestSuite : function(testSuiteName){
-      var testSuite = new Y.Test.Suite({name: testSuiteName});
-      testSuite.add = testSuite.add.createSequence(this.addTestCaseRecord, testSuite);
-      this.ts.add(testSuiteName, testSuite);
-      return testSuite;
+      return new Ext.test.testSuite({name: testSuiteName})
   }
-  /*
+  /**
    * Find a Test Suite 
    * @param {String} testSuiteName The name of the TestSuite
    * @return {Y.Test.Suite} return Y.Test.Suite
    */
   , findTestSuite : function(testSuiteName){
-	 return this.ts.get(testSuiteName);
+	    return this.ts.get(testSuiteName);
   }
-  /*
+  /**
+   * Register a Test suite in this session
+   * @param {Ext.test.testSuite} testSuite the testsuite to register
+   */
+  , registerTestSuite : function(testSuite){
+      var name = testSuite.name;
+      if (this.ts.indexOf(name) == -1){
+        Ext.test.session.ts.add(name, testSuite); 
+      }
+  }
+  /**
    * Find a Test Case
    * @param {String} testSuiteName The name of the TestSuite
    * @param {String} testCaseName The name of the TestCase
    * @return {Ext.test.testCase} return Ext.test.testCase
    */
   , findTestCase : function(testSuiteName, testCaseName){
-	var ts = this.findTestSuite(testSuiteName);
-	var items = ts.items;
-	var len = items.length;
-	var item;
-	for (var i = 0; i < len; i++){
-	   	item = items[i];
-	   	if (item.name == testCaseName){
-		  return item;	
-	    }
-    }
+	    var ts = this.findTestSuite(testSuiteName);
+      var items = ts.items;
+      var len = items.length;
+      var item;
+      for (var i = 0; i < len; i++){
+          item = items[i];
+          if (item.name == testCaseName){
+          return item;	
+          }
+        }
   }
   // Add a Record containing testCase information
-  , addTestCaseRecord: function(testCase, testSuite){
+  , addRecord: function(testCase, testSuite){
       testSuite = testSuite || this;
       
       Ext.test.Store.addSorted(new Ext.test.Record({
@@ -287,13 +293,12 @@ Ext.test.session = {
       return Ext.test.Store.getAt(idx);
   }
   /*
-   * Add a testCase 
+   * Add a testCase to Ext.test.session
    * @param {String} testSuiteName The name of the TestSuite
-   * @param {String} testCaseName The name of the TestCase
+   * @param {String} testCase The TestCase
    */
-  , addTest : function(testSuiteName,testCaseName){
+  , addTest : function(testSuiteName,testCase){
       var testSuite = this.getSuite(testSuiteName);
-      var testCase  = new Y.Test.Case(testCaseName);
       testSuite.add(testCase);
   }
 };
