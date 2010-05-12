@@ -1,0 +1,23 @@
+.yui-log-hd, .yui-log-ft {
+  display: none;
+}
+
+.passed-test-group { background-color: #00FF00; color: white;}
+.failed-test-group { background-color: #FF0000; color: white;}
+
+#console-panel .x-panel-body{
+  background-color: #1E1E1E;
+  color: #FFFFFF;
+}
+.yui-log-bd pre {
+ white-space: nowrap;
+}
+.pass {
+  color: #00FF00;
+}
+.fail {
+  color: #FF0000;
+}
+.info {
+  color: #FFFF00;
+}
