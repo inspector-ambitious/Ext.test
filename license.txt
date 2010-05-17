@@ -1,9 +1,9 @@
-ext-unit-test
-http://code.google.com/p/extjs-unit-test/
+Ext.test
+http://github.com/yhwh/Ext.test
 
 Open Source License
 ------------------------------------------------------------------------------------------
-This project is licensed under the terms of the Open Source GPL 3.0 license. 
+This project is licensed under the terms of the Open Source GPL 3.0 license.
   - http://www.gnu.org/licenses/gpl.html
 
 This project includes the original source code of ExtJS, which is also licensed under GPL 3.0.

@@ -5,8 +5,8 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9b
- * @date	May 12, 2010
+ * @version 0.9c
+ * @date	May 17, 2010
  */
 Ext.test.session = {
     testCaseCount : 0
@@ -111,7 +111,7 @@ Ext.test.session = {
       Y.Test.Runner.subscribe("testcasebegin", this.onTestRunnerEvent);
       Y.Test.Runner.subscribe("testcasecomplete", this.onTestRunnerEvent);
       Y.Test.Runner.subscribe("testsuitebegin", this.onTestRunnerEvent);
-      //Y.Test.Runner.subscribe("testsuitecomplete", this.onTestRunnerEvent);
+      Y.Test.Runner.subscribe("testsuitecomplete", this.onTestRunnerEvent);
   }
 
   // Reset all tests
@@ -133,6 +133,11 @@ Ext.test.session = {
           if (expand){
             p.expand(); 
           }
+        }
+        if (attr['type'] == 'testSuite'){
+            ui = node.getUI();
+            iconEl = ui.getIconEl();
+            iconEl.className = 'x-tree-node-icon';
         }
       }, this);
   }
@@ -195,6 +200,17 @@ Ext.test.session = {
             } 
             node.attributes['results'] = String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored);
             break;
+        case "testsuitecomplete":
+            var tnode = Ext.test.session.getTestSuiteNode(event.testSuite.name);
+            var ui = tnode.getUI();
+            var iconEl = ui.getIconEl();
+            if (event.results.passed === event.results.total){
+              iconEl.className = 'testsuite-passed';
+            }
+            if (event.results.failed > 0){
+              iconEl.className = 'testsuite-failed';
+            }
+            break;
         case "complete":
             var pbar = Ext.getCmp('progress-bar');
             pbar.updateProgress(1, '100% completed...');
@@ -205,7 +221,6 @@ Ext.test.session = {
         var attr = Ext.apply({},node.attributes);
         var p = node.parentNode;
         var expand = p.isExpanded();
-        p.suspendEvents();
         p.replaceChild(new Ext.tree.TreeNode(attr), node);
         node.destroy();
         if (expand){
@@ -239,7 +254,7 @@ Ext.test.session = {
    * @return {Y.Test.Suite} return Y.Test.Suite
    */
   , findTestSuite : function(testSuiteName){
-	    return this.ts.get(testSuiteName);
+      return this.ts.get(testSuiteName);
   }
   /**
    * Register a Test suite in this session
@@ -291,7 +306,7 @@ Ext.test.session = {
    * @return {Ext.test.testCase} return Ext.test.testCase
    */
   , findTestCase : function(testSuiteName, testCaseName){
-	    var ts = this.findTestSuite(testSuiteName);
+      var ts = this.findTestSuite(testSuiteName);
       var items = ts.items;
       var len = items.length;
       var item;
@@ -302,13 +317,26 @@ Ext.test.session = {
           }
         }
   }
-  // Retrieve a record by testName
-  , getTestCaseNode: function(testName){
+  // Retrieve a record by testCase Name
+  , getTestCaseNode : function(name){
       var n,
           attr;
       Ext.test.session.rootNode.cascade(function(node){
         attr = node.attributes;
-        if (attr['type'] == 'testCase' && attr['name'] == testName){
+        if (attr['type'] == 'testCase' && attr['name'] == name){
+          n = node;
+          return false;
+        }
+      }, this);
+      return n;
+  }
+  // Retrieve a record by testSuite Name
+  , getTestSuiteNode : function(name){
+      var n,
+          attr;
+      Ext.test.session.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testSuite' && attr['name'] == name){
           n = node;
           return false;
         }

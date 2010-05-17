@@ -2,9 +2,6 @@
   display: none;
 }
 
-.passed-test-group { background-color: #00FF00; color: white;}
-.failed-test-group { background-color: #FF0000; color: white;}
-
 #console-panel .x-panel-body{
   background-color: #1E1E1E;
   color: #FFFFFF;
@@ -21,3 +18,25 @@
 .info {
   color: #FFFF00;
 }
+
+.testsuite-failed, .testsuite-passed  {
+  background-image:url("../ext-3.2.1/resources/images/default/tree/drop-yes.gif");
+  background-position:center center;
+  background-repeat:no-repeat;
+  border:0 none;
+  height:18px;
+  margin:0;
+  padding:0;
+  vertical-align:top;
+  width:16px;
+}
+
+.testsuite-passed {
+  background-image:url("../ext-3.2.1/resources/images/default/tree/drop-yes.gif");
+}
+
+.testsuite-failed {
+  background-image:url("../ext-3.2.1/resources/images/default/tree/drop-no.gif");
+}
+
+

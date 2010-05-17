@@ -3,8 +3,8 @@
  * TestCase class
  * @extend Y.Test.Case
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9b
- * @date	May 12, 2010
+ * @version 0.9c
+ * @date	May 17, 2010
  */
 Ext.test.testCase = Ext.extend(Y.Test.Case,{
   /**
@@ -12,10 +12,10 @@ Ext.test.testCase = Ext.extend(Y.Test.Case,{
 	 */
     autoReg : false
   ,	constructor : function(){
-	  Ext.test.testCase.superclass.constructor.apply(this,arguments);
-		if (this.autoReg){
-			this.register();
-	  }
+	    Ext.test.testCase.superclass.constructor.apply(this,arguments);
+		  if (this.autoReg){
+			  this.register();
+	    }
   }
   /**
    * Register Test Case in Ext.test.session
