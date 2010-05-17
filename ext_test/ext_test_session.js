@@ -5,16 +5,20 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9c
+ * @version 0.9d
  * @date	May 17, 2010
  */
 Ext.test.session = {
     testCaseCount : 0
+  , passText : 'Passed'
+  , failText : 'Failed!' 
   // create a MixedCollection of instancied TestSuites
   , ts : new Ext.util.MixedCollection() 
+
   , rootNode : new Ext.tree.TreeNode({
           text: 'My Tests Session'
         , expanded: true
+        //, uiProvider: Ext.ux.tree.ColumnNodeUIPlus
   })
   // Let's the action begin
   , boot : function() {
@@ -30,14 +34,16 @@ Ext.test.session = {
       var testViewport = new Ext.Viewport({
           layout: 'border'
         , items: [{
-                xtype : 'columntree'
-              , region : 'center'
-              , header : true
-              , id : 'test-tree'
-              , height : 350
-              , autoScroll : true
+                xtype       : 'columntree'
+              , region      : 'center'
+              , useArrows   : true
+              , header      : true
+              , id          : 'test-tree'
+              , height      : 350
+              , autoScroll  : true
               , rootVisible : false
-              , bbar: [
+              , title : document.title
+              , tbar: [
                   new Ext.Button({
                         text    : 'Start'
                       , iconCls : 'x-tbar-page-next'
@@ -62,12 +68,12 @@ Ext.test.session = {
                     dataIndex : 'state'
                   , header    : 'State'
                   , id        : 'state'
-                  , renderer  : function(val, cell, record) {
+                  , renderer  : function(val) {
                          var color = '#000';
-                          if (val == 'Test passed.') {
+                          if (val == Ext.test.session.passText) {
                               color = "#00FF00";
                           }
-                          else if (val == 'Test failed!') {
+                          else if (val == Ext.test.session.failText) {
                             color = '#FF0000';
                           }
                           return '<span style="color: '+color+'; font-weight: bold;">' + val + '</span>';
@@ -91,7 +97,6 @@ Ext.test.session = {
             , id          : 'console-panel'
             , height      : 125
             , minSize     : 50       // defaults to 50
-            , maxSize     : 200
             , header      : false
             , html        : '<div id="test_logger"></div>'
           }
@@ -116,28 +121,18 @@ Ext.test.session = {
 
   // Reset all tests
   , resetNodes : function(){
-      var attr,
-          nattr,
-          p;
+      var attr, ui;
       this.rootNode.cascade(function(node){
-        attr = node.attributes;
-        if (attr['type'] == 'testCase'){
-          node.attributes['results'] = '';
-          node.attributes['details'] = '';
-          node.attributes['state'] = 'Pending...';
-          nattr = Ext.apply({},node.attributes);
-          p = node.parentNode;
-          var expand = p.isExpanded();
-          p.replaceChild(new Ext.tree.TreeNode(nattr), node);
-          node.destroy();
-          if (expand){
-            p.expand(); 
+        if (node != this.rootNode){
+          attr = node.attributes;
+          ui = node.ui;
+          attr['results'] = '';
+          attr['details'] = '';
+          attr['state']   = '';
+          if (attr['type'] == 'testSuite'){
+            ui.setIconElClass('x-tree-node-icon');
           }
-        }
-        if (attr['type'] == 'testSuite'){
-            ui = node.getUI();
-            iconEl = ui.getIconEl();
-            iconEl.className = 'x-tree-node-icon';
+          ui.refreshNode();
         }
       }, this);
   }
@@ -164,10 +159,13 @@ Ext.test.session = {
   // initialize test runner
   , initTestRunner : function() {
 	    Y.Test.Runner.clear();
-      this.ts.sort('ASC');
-      this.ts.each(function(t){
-        Y.Test.Runner.add((t));
-      },this);
+      this.rootNode.cascade(function(node){
+        attr = node.attributes;
+        if (attr['type'] == 'testSuite'){
+          var t = this.findTestSuite(attr.name);
+          Y.Test.Runner.add((t));
+        }
+      }, this);
 	    Y.Test.Runner.run();   
   }
   // Handle test runner events
@@ -178,14 +176,16 @@ Ext.test.session = {
       switch(event.type){
         case "fail":
             node = Ext.test.session.getTestCaseNode(event.testCase.name);
-            node.attributes['state'] =  'Test failed!';
+            node.attributes['state'] = Ext.test.session.failText;
             var rd = node.attributes['details'];
             var details = String.format('{0}{1}: {2}<br>', rd || '', event.testName, event.error.toString());
             node.attributes['details'] = details; 
+            node.ui.refreshNode();
             break;
         case "testcasebegin":
             node = Ext.test.session.getTestCaseNode(event.testCase.name);
             node.attributes['state'] =  'Running...';
+            node.ui.refreshNode();
             break;
         case "testcasecomplete":
             Ext.test.session.testCaseCount++;
@@ -196,36 +196,35 @@ Ext.test.session = {
             pbar.updateProgress(c, Math.round(100*c)+'% completed...');
             res = event.results;
             if (res.failed === 0) {
-              node.attributes['state'] = 'Test passed.'
+              node.attributes['state'] = Ext.test.session.passText;
             } 
             node.attributes['results'] = String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored);
+            node.ui.refreshNode();
+            break;
+        case "testsuitebegin":
+            node = Ext.test.session.getTestSuiteNode(event.testSuite.name);
+            node.ui.setIconElClass('testsuite-running');
+            node.ui.refreshNode();
             break;
         case "testsuitecomplete":
-            var tnode = Ext.test.session.getTestSuiteNode(event.testSuite.name);
-            var ui = tnode.getUI();
-            var iconEl = ui.getIconEl();
-            if (event.results.passed === event.results.total){
-              iconEl.className = 'testsuite-passed';
+            node = Ext.test.session.getTestSuiteNode(event.testSuite.name);
+            res = event.results;
+            if (res.passed === res.total){
+              node.attributes['state'] = Ext.test.session.passText;
+              node.ui.setIconElClass('testsuite-passed');
             }
-            if (event.results.failed > 0){
-              iconEl.className = 'testsuite-failed';
+            if (res.failed > 0){
+              node.attributes['state'] = Ext.test.session.failText;
+              node.ui.setIconElClass('testsuite-failed');
             }
+            node.attributes['results'] = String.format('Passed: {0}, Failed: {1}, Ignored: {2} ', res.passed, res.failed, res.ignored);
+            node.ui.refreshNode();
             break;
         case "complete":
             var pbar = Ext.getCmp('progress-bar');
             pbar.updateProgress(1, '100% completed...');
             Ext.getCmp('start-button').enable();
             break;
-      }
-      if (node){
-        var attr = Ext.apply({},node.attributes);
-        var p = node.parentNode;
-        var expand = p.isExpanded();
-        p.replaceChild(new Ext.tree.TreeNode(attr), node);
-        node.destroy();
-        if (expand){
-          p.expand(); 
-        }
       }
   }
   /*
@@ -267,7 +266,7 @@ Ext.test.session = {
       }
       var n = new Ext.tree.TreeNode({
            name      : name
-         , uiProvider: Ext.ux.tree.ColumnNodeUI
+         , uiProvider: Ext.ux.tree.ColumnNodeUIPlus
          , type      : 'testSuite'
          , state     : ''
          , results   : ''
@@ -279,7 +278,7 @@ Ext.test.session = {
   , registerTestCase : function(testCase, testSuite){
       var n = new Ext.tree.TreeNode({
             name       : testCase.name
-          , uiProvider : Ext.ux.tree.ColumnNodeUI
+          , uiProvider : Ext.ux.tree.ColumnNodeUIPlus
           , type       : 'testCase'
           , state      : 'Pending...' 
           , results    : ''

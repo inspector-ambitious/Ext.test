@@ -1,3 +1,4 @@
+/* console style */
 .yui-log-hd, .yui-log-ft {
   display: none;
 }
@@ -18,8 +19,11 @@
 .info {
   color: #FFFF00;
 }
+/* end of console style */
 
-.testsuite-failed, .testsuite-passed  {
+/* treenode icon style */
+ 
+.testsuite-failed, .testsuite-passed , .testsuite-running {
   background-image:url("../ext-3.2.1/resources/images/default/tree/drop-yes.gif");
   background-position:center center;
   background-repeat:no-repeat;
@@ -39,4 +43,8 @@
   background-image:url("../ext-3.2.1/resources/images/default/tree/drop-no.gif");
 }
 
+.testsuite-running {
+  background-image:url("../ext-3.2.1/resources/images/default/tree/loading.gif");
+}
 
+/* end of  treenode icon style */

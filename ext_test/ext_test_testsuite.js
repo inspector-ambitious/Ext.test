@@ -3,7 +3,7 @@
  * TestSuite class
  * @extend Y.Test.Case
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9c
+ * @version 0.9d
  * @date	May 17, 2010
  */
 Ext.test.testSuite = Ext.extend(Y.Test.Suite,{
