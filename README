@@ -1,4 +1,6 @@
 Extract Extjs 3.2.1 Package in this folder then open index.html
-At this time this framework is only tested with Chrome and Firefox
+
+This testing harness works with Internet Explorer 6-8, Firefox, and Chrome. Not yet tested on Safari.
+
 More information at:
 http://www.extjs.com/forum/showthread.php?98502-Extjs-3.2.X-Unit-Testing-and-Ext.test.session-implementation

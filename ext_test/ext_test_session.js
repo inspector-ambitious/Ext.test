@@ -5,8 +5,8 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9d
- * @date	May 17, 2010
+ * @version 0.9e
+ * @date	May 18, 2010
  */
 Ext.test.session = {
     testCaseCount : 0
@@ -31,10 +31,11 @@ Ext.test.session = {
   }
   // Build Test Session interface
   , buildUI : function(){
+      Ext.QuickTips.init();
       var testViewport = new Ext.Viewport({
           layout: 'border'
         , items: [{
-                xtype       : 'columntree'
+                xtype       : 'columntreeplus'
               , region      : 'center'
               , useArrows   : true
               , header      : true
@@ -69,14 +70,14 @@ Ext.test.session = {
                   , header    : 'State'
                   , id        : 'state'
                   , renderer  : function(val) {
-                         var color = '#000';
-                          if (val == Ext.test.session.passText) {
-                              color = "#00FF00";
-                          }
-                          else if (val == Ext.test.session.failText) {
-                            color = '#FF0000';
-                          }
-                          return '<span style="color: '+color+'; font-weight: bold;">' + val + '</span>';
+                     var color = '#000';
+                      if (val == Ext.test.session.passText) {
+                          color = "#00FF00";
+                      }
+                      else if (val == Ext.test.session.failText) {
+                        color = '#FF0000';
+                      }
+                      return '<span style="color: '+color+';font-weight: bold;">' + val + '</span>';
                   }
                   , width     : 200
                 },{
@@ -88,6 +89,10 @@ Ext.test.session = {
                     dataIndex : 'details'
                   , id        : 'details'
                   , header    : 'Details'
+                  , width     : 250
+                  , renderer  : function(val) {
+                      return '<span ext:qtip="'+val+'">' + val + '</span>';
+                  }
               }]
           },{
               xtype       : 'panel'

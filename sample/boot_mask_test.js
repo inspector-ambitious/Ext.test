@@ -28,7 +28,7 @@ new Ext.test.testSuite({
         name : 'Test defaultValues'
        /* Test default class values */
       , testDefaultValues : function() {
-          Y.Assert.areEqual('11000', this.bootMask.zIndex, 'Test zIndex default value');
+          Y.Assert.areEqual(11000, this.bootMask.zIndex, 'Test zIndex default value');
       }
 	 },{
       /* testCase name */
@@ -38,7 +38,7 @@ new Ext.test.testSuite({
           this.bootMask.show();
           var mask = this.el.child('.ext-el-mask');
           var zindex = mask.getStyle('z-index');
-          Y.Assert.areSame(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
+          Y.Assert.areEqual(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
       }
       /* Test that mask is not created if bootMask is disabled */
       , testDisable : function(){
@@ -78,14 +78,14 @@ new Ext.test.testCase({
   }
   /* Test default class values */
   , testDefaultValues: function() {
-      Y.Assert.areEqual('11000', this.bootMask.zIndex, 'Test zIndex default value');
+      Y.Assert.areEqual(11000, this.bootMask.zIndex, 'Test zIndex default value');
   }
   /* Test if the setted zIndex after a bootMask show is valid */
   , testZindex : function(){
       this.bootMask.show();
       var mask = this.el.child('.ext-el-mask');
       var zindex = mask.getStyle('z-index');
-      Y.Assert.areSame(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
+      Y.Assert.areEqual(zindex, this.bootMask.zIndex, 'Test to ensure that global mask z-index is valid.');
   }
   /* Test that mask is not created if bootMask is disabled */
   , testDisable : function(){

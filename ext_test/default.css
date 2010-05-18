@@ -33,6 +33,7 @@
   padding:0;
   vertical-align:top;
   width:16px;
+  line-height:18px;
 }
 
 .testsuite-passed {
@@ -48,3 +49,10 @@
 }
 
 /* end of  treenode icon style */
+
+/* ColumnNodeUI css fix */
+
+.x-tree-col {
+    height: 18px;
+}
+/* end of ColumnNodeUI css fix */

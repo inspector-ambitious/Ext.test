@@ -8,7 +8,7 @@ Ext.ux.bootMask = Ext.extend(Ext.LoadMask,{
     /**
      * @cfg {String} zIndex (defaults to 11000) the mask zIndex value
      */
-     zIndex: '11000'
+     zIndex: 11000
     // add zIndex support to mask
    , onBeforeLoad : function(){
         if(!this.disabled){
