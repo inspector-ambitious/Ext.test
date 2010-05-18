@@ -23,7 +23,7 @@ new Ext.test.testSuite({
 		  }
    }
    /* Here the testCases */
-  , testCases : [{
+  , items : [{
       /* testCase name */
         name : 'Test defaultValues'
        /* Test default class values */
@@ -47,7 +47,7 @@ new Ext.test.testSuite({
           var mask = this.el.child('.ext-el-mask');
           Y.Assert.isNull(mask, 'Test that mask is not created when Ext.ux.bootMask is disabled');
       }
-	}]
+  }]
 });
 
 

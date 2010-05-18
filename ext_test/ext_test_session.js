@@ -5,7 +5,7 @@
  * without PieChart 
  * @singleton
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 0.9e
+ * @version 0.9f
  * @date	May 18, 2010
  */
 Ext.test.session = {
@@ -164,7 +164,7 @@ Ext.test.session = {
   // initialize test runner
   , initTestRunner : function() {
 	    Y.Test.Runner.clear();
-      this.rootNode.cascade(function(node){
+      this.rootNode.eachChild(function(node){
         attr = node.attributes;
         if (attr['type'] == 'testSuite'){
           var t = this.findTestSuite(attr.name);
@@ -264,7 +264,7 @@ Ext.test.session = {
    * Register a Test suite in this session
    * @param {Ext.test.testSuite} testSuite the testsuite to register
    */
-  , registerTestSuite : function(testSuite){
+  , registerTestSuite : function(testSuite, testSuiteParent){
       var name = testSuite.name;
       if (this.ts.indexOf(name) == -1){
         Ext.test.session.ts.add(name, testSuite); 
@@ -277,7 +277,8 @@ Ext.test.session = {
          , results   : ''
          , details   : ''
       });
-      this.rootNode.appendChild(n);
+      var pnode = testSuiteParent ? this.getTestSuiteNode(testSuiteParent.name) : this.rootNode;
+      pnode.appendChild(n);
   }
   // Add a Testcase to tree
   , registerTestCase : function(testCase, testSuite){
