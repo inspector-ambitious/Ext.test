@@ -1,22 +1,21 @@
 /* console style */
-.yui-log-hd, .yui-log-ft {
-  display: none;
-}
-
-#console-panel .x-panel-body{
+.x-test-logger .x-grid3-scroller {
   background-color: #1E1E1E;
-  color: #FFFFFF;
 }
-.yui-log-bd pre {
- white-space: nowrap;
+.x-test-logger .x-grid3-row {
+  border-color:#1E1E1E;
 }
-.pass {
+.x-test-logger-state-pass {
   color: #00FF00;
 }
-.fail {
+.x-test-logger-state-fail {
+  font-weight: bold;
   color: #FF0000;
 }
-.info {
+.x-test-logger-state-testsuitecomplete, .x-test-logger-state-testsuitebegin,
+.x-test-logger-state-complete, .x-test-logger-state-begin,
+.x-test-logger-state-testcasecomplete, .x-test-logger-state-testcasebegin
+{
   color: #FFFF00;
 }
 /* end of console style */
@@ -56,3 +55,4 @@
     height: 18px;
 }
 /* end of ColumnNodeUI css fix */
+

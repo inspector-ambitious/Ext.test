@@ -56,8 +56,6 @@ new Ext.test.testCase({
    name : 'Test defaultValues, zIndex and disable'
   // Important automatically register testCase in Ext.test.session
   , autoReg : true
-  // the testSuite is created if it doesn't exist
-  , testSuiteName : 'Ext.ux.bootMask Sample 2'
   /**
    * The setUp method create a div in the body allowing to render
    * bootMask into. This method is run before each test.

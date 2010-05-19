@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Ext.Test.Session 0.9f</title>
+		<title>Ext.Test.Session 1.0</title>
 
 <!--
     EXTJS 3.2.1
@@ -28,12 +28,40 @@
 -->
 
     <link rel="stylesheet" type="text/css" href="ext_test/default.css" />
-    <script type="text/javascript" src="ext_test/ColumnNodeUIPlus.js"></script>
+
     <script type="text/javascript" src="ext_test/yuitest_hooks.js"></script>
     <script type="text/javascript" src="ext_test/namespace.js"></script>
-    <script type="text/javascript" src="ext_test/ext_test_session.js"></script>
-    <script type="text/javascript" src="ext_test/ext_test_testsuite.js"></script>
-    <script type="text/javascript" src="ext_test/ext_test_testcase.js"></script>
+    <script type="text/javascript" src="ext_test/session.js"></script>
+    <script type="text/javascript" src="ext_test/runner.js"></script>
+    <script type="text/javascript" src="ext_test/viewer.js"></script>
+    <script type="text/javascript" src="ext_test/logger.js"></script>
+    <script type="text/javascript" src="ext_test/testsuite.js"></script>
+    <script type="text/javascript" src="ext_test/testcase.js"></script>
+    
+    <script type="text/javascript">
+      (function(){
+        var grid = new Ext.test.Logger({
+            region: 'south',
+            height: 200,
+            split: true,
+            minSize: 100
+        });
+        var viewer = new Ext.test.Viewer({
+            region: 'center',
+            title: 'My Test Session',
+            height: 350
+        });
+        Ext.onReady(function(){
+          Ext.QuickTips.init();
+          var testViewport = new Ext.Viewport({
+              layout : 'border',
+              items : [viewer,grid]
+          });
+          testViewport.show(); 
+        },this);
+      })();
+  </script>
+  
 <!--
     EXTJS 3.2.1 UNIT TESTS
 -->
@@ -84,8 +112,5 @@
     <script type="text/javascript" src="my_test.js"></script>
 -->
 	</head>
-
-	<body>
-
-	</body>
+	<body></body>
 </html>
