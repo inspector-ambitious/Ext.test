@@ -36,8 +36,8 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
     createSuite: function(name) {
         return new Ext.test.testSuite({
             name: name
-        })
-        },
+        });
+    },
     /**
    * Find a Test Suite 
    * @param {String} name The name of the TestSuite
