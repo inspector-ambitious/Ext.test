@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Ext.Test.Session 1.0</title>
+		<title>Ext.test 1.1 Demo Full</title>
 
 <!--
     EXTJS 3.2.1
@@ -18,11 +18,22 @@
 -->
 
 <!--
-    YUI TEST MINIMUM LIBRARY
+    YUI 3.1.1 TEST MINIMUM LIBRARY
 -->
-    <script type="text/javascript" src="ext-3.2.1/src/ext-core/test/yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-    <script type="text/javascript" src="ext-3.2.1/src/ext-core/test/yui_2.6.0/yui/build/logger/logger-min.js"></script>
-    <script type="text/javascript" src="ext-3.2.1/src/ext-core/test/yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/yui-base-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/dump-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/substitute-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/oop-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/dom-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/yui-later-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/event-custom-base-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/event-base-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/pluginhost-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/node-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/event-delegate-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/json-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/event-simulate-min.js"></script>
+    <script type="text/javascript" src="yui_3.1.1/test-min.js"></script>
 <!--
     END OF YUI TEST MINIMUM LIBRARY
 -->
@@ -33,23 +44,33 @@
     <script type="text/javascript" src="ext_test/namespace.js"></script>
     <script type="text/javascript" src="ext_test/session.js"></script>
     <script type="text/javascript" src="ext_test/runner.js"></script>
-    <script type="text/javascript" src="ext_test/viewer.js"></script>
-    <script type="text/javascript" src="ext_test/logger.js"></script>
     <script type="text/javascript" src="ext_test/testsuite.js"></script>
     <script type="text/javascript" src="ext_test/testcase.js"></script>
+    <script type="text/javascript" src="ext_test/view/namespace.js"></script>
+    <script type="text/javascript" src="ext_test/view/startbutton.js"></script>
+    <script type="text/javascript" src="ext_test/view/progressbar.js"></script>
+    <script type="text/javascript" src="ext_test/view/uiprovider.js"></script>
+    <script type="text/javascript" src="ext_test/view/columntree.js"></script>
+    <script type="text/javascript" src="ext_test/view/logger.js"></script>
     
     <script type="text/javascript">
       (function(){
-        var grid = new Ext.test.Logger({
+        var grid = new Ext.test.view.Logger({
             region: 'south',
             height: 200,
             split: true,
             minSize: 100
         });
-        var viewer = new Ext.test.Viewer({
+        var viewer = new Ext.test.view.ColumnTree({
             region: 'center',
-            title: 'My Test Session',
-            height: 350
+            title: document.title,
+            height: 350,
+            tbar: [{
+                xtype: 'teststartbutton'
+            }, '->', {
+                xtype: 'testprogressbar',
+                width: 500
+            }]
         });
         Ext.onReady(function(){
           Ext.QuickTips.init();

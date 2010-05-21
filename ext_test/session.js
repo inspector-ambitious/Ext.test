@@ -1,25 +1,33 @@
 /**
  * @class Ext.test.Session
- * The Test Session Class 
- * @extend Ext.util.Observable
+ * The Test Session Class. 
+ * @extends Ext.util.Observable
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.0
- * @date	May 19, 2010
+ * @version 1.1
+ * @date	May 21, 2010
  */
 Ext.test.Session = Ext.extend(Ext.util.Observable, {
-    // create a MixedCollection of instancied TestSuites
+   /**
+     * @property ts
+     * A MixedCollection of instancied Ext.test.TestSuites.
+     * @type Ext.util.MixedCollection
+     */
     ts: new Ext.util.MixedCollection(),
-    // create a MixedCollection of instancied TestCases
+   /**
+     * @property tc
+     * A MixedCollection of instancied Ext.test.TestCases.
+     * @type Ext.util.MixedCollection
+     */
     tc: new Ext.util.MixedCollection(),
     // adding some events
     constructor: function() {
         Ext.test.Session.superclass.constructor.apply(this, arguments);
         this.addEvents('registersuite', 'registercase');
     },
-    /**
-   * Get an existing Test Suite or Create it if it doesn't exist
-   * @param {String} name The name of the TestSuite
-   * @return {Y.Test.Suite} return Y.Test.Suite
+  /**
+   * Get an existing Ext.test.TestSuite or create it if it doesn't exist.
+   * @param {String} name The name of the Ext.test.TestSuite
+   * @return {Ext.test.TestSuite} The Ext.test.TestSuite
    */
     getSuite: function(name) {
         var t = this.findSuite(name);
@@ -28,38 +36,38 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
         }
         return t;
     },
-    /**
-   * Create a Test Suite
-   * @param {String} name The name of the TestSuite
-   * @return {Y.Test.Suite} return Y.Test.Suite created
+  /**
+   * Create an Ext.testtestSuite.
+   * @param {String} name The name of the Ext.test.TestSuite
+   * @return {Ext.test.TestSuite} The Ext.test.TestSuite
    */
     createSuite: function(name) {
-        return new Ext.test.testSuite({
+        return new Ext.test.TestSuite({
             name: name
         });
     },
-    /**
-   * Find a Test Suite 
-   * @param {String} name The name of the TestSuite
-   * @return {Ext.test.testSuite} return Ext.test.testSuite
+  /**
+   * Find an Ext.test.TestSuite by this name.
+   * @param {String} name The name of the Ext.test.TestSuite
+   * @return {Ext.test.TestSuite} The Ext.test.TestSuite
    */
     findSuite: function(name) {
         return this.ts.get(name);
     },
-    /**
-   * Register a Test suite in this session
-   * @param {Ext.test.testSuite} testSuite the testsuite to register
+  /**
+   * Register an Ext.test.TestSuite into this session.
+   * @param {Ext.test.TestSuite} testSuite The Ext.test.TestSuite to register
    */
     registerSuite: function(testSuite) {
         var name = testSuite.name;
-        if (this.ts.indexOf(name) != -1) {
+        if (this.ts.indexOf(name) == -1) {
             this.ts.add(name, testSuite);
         }
         this.fireEvent('registersuite', this, testSuite);
     },
-    /**
-   * Register a Test Case in this session
-   * @param {Ext.test.Case} testCase the testcase to register
+  /**
+   * Register an Ext.testSuite into this session.
+   * @param {Ext.test.Case} testCase The testcase to register
    */
     registerCase: function(testCase) {
         var name = testCase.name;
@@ -68,22 +76,45 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
         }
         this.fireEvent('registercase', this, testCase);
     },
-    /**
-   * Find a Test Case
-   * @param {String} name The name of the TestCase
-   * @return {Ext.test.testCase} return Ext.test.testCase
+  /**
+   * Find an Ext.test.TestCase by this name.
+   * @param {String} name The name of the Ext.test.TestCase 
+   * @return {Ext.test.TestCase} The Ext.test.TestCase
    */
     findCase: function(name) {
         return this.ts.get(name);
     },
-    /**
-   * Add a testCase to Ext.test.session
-   * @param {String} testSuiteName The name of the TestSuite
-   * @param {String} testCase The TestCase
+  /**
+   * Add a testCase to Ext.test.session.
+   * @param {String} name The name of the Ext.test.TestSuite
+   * @param {String} testCase The Ext.test.TestCase
    */
-    addTest: function(testSuiteName, testCase) {
-        var testSuite = this.getSuite(testSuiteName);
+    addTest: function(name, testCase) {
+        var testSuite = this.getSuite(name);
         testSuite.add(testCase);
+    },
+  /**
+   * Get the number of registered Ext.test.TestCase in this Ext.test.session.
+   * @return {Number} The number of Ext.test.TestCase
+   */
+    getTestCaseCount: function() {
+        var c = 0;
+        this.ts.each(function(t){
+            c += t.getTestCaseCount();
+        },this);
+        c += this.tc.getCount();
+        return c;
+    },
+   /**
+   * Get the number of registered Ext.test.TestSuite in this Ext.test.session.
+   * @return {Number} The number of testSuite
+   */
+    getTestSuiteCount: function() {
+        var c = 0;
+        this.ts.each(function(t){
+            c += (t.getTestSuiteCount() + 1);
+        },this);
+        return c;
     }
 });
 

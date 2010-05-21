@@ -20,7 +20,7 @@
 }
 /* end of console style */
 
-/* treenode icon style */
+/* columntreee icon style */
  
 .testsuite-failed, .testsuite-passed , .testsuite-running {
   background-image:url("../ext-3.2.1/resources/images/default/tree/drop-yes.gif");
@@ -39,7 +39,7 @@
   background-image:url("../ext-3.2.1/resources/images/default/tree/drop-yes.gif");
 }
 
-.testsuite-failed {
+.testsuite-failed, .testcase-failed {
   background-image:url("../ext-3.2.1/resources/images/default/tree/drop-no.gif");
 }
 
@@ -47,7 +47,7 @@
   background-image:url("../ext-3.2.1/resources/images/default/tree/loading.gif");
 }
 
-/* end of  treenode icon style */
+/* end of columntree icon style */
 
 /* ColumnNodeUI css fix */
 

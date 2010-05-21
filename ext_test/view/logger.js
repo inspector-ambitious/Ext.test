@@ -1,12 +1,12 @@
 /**
- * @class Ext.test.Logger
- * A Console that show Ext.test.runner events
- * @extend Ext.grid.GridPanel
+ * @class Ext.test.view.Logger
+ * A Console that show Ext.test.runner events.
+ * @extends Ext.grid.GridPanel
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.0
- * @date	May 19, 2010
+ * @version 1.1
+ * @date	May 21, 2010
  */
-Ext.test.Logger = Ext.extend(Ext.grid.GridPanel, {
+Ext.test.view.Logger = Ext.extend(Ext.grid.GridPanel, {
     autoWidth: true,
     viewConfig: {
         forceFit: true
@@ -15,9 +15,19 @@ Ext.test.Logger = Ext.extend(Ext.grid.GridPanel, {
     disableSelection: true,
     trackMouseOver: false,
     initComponent: function() {
+        this.configureStore();
+        this.configureColumns();
+        this.monitorTestRunner();
+        Ext.test.view.Logger.superclass.initComponent.apply(this, arguments);
+    },
+    // store config
+    configureStore: function(){
         this.store = new Ext.data.JsonStore({
             fields: ['logs', 'state']
-            });
+        });
+    },
+    // default column and his renderer
+    configureColumns: function(){
         this.columns = [{
             header: 'Logs',
             dataIndex: 'logs',
@@ -25,9 +35,11 @@ Ext.test.Logger = Ext.extend(Ext.grid.GridPanel, {
                 return '<span class="x-test-logger-state-' + record.get('state') + '">' + value + '</span>';
             }
         }];
+    },
+    // monitor test runner events
+    monitorTestRunner: function(){
         var fn = this.onTestRunnerEvent;
         var r = Ext.test.runner;
-
         this.mon(r, 'begin', fn, this);
         this.mon(r, 'complete', fn, this);
         this.mon(r, 'fail', fn, this);
@@ -37,9 +49,8 @@ Ext.test.Logger = Ext.extend(Ext.grid.GridPanel, {
         this.mon(r, 'testcasecomplete', fn, this);
         this.mon(r, 'testsuitebegin', fn, this);
         this.mon(r, 'testsuitecomplete', fn, this);
-
-        Ext.test.Logger.superclass.initComponent.apply(this, arguments);
     },
+    // add records on each runner events
     onTestRunnerEvent: function(r, e) {
         var logs;
         switch (e.type) {
@@ -78,6 +89,5 @@ Ext.test.Logger = Ext.extend(Ext.grid.GridPanel, {
             }));
         }
     }
-
 });
-Ext.reg('testlogger', Ext.test.Logger);
+Ext.reg('testlogger', Ext.test.view.Logger);

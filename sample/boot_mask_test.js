@@ -1,4 +1,4 @@
-new Ext.test.testSuite({
+new Ext.test.TestSuite({
 	 /* testSuite name */
 	  name : 'Ext.ux.bootMask Sample 1'
 	 /* This defaults function are available for all TestCase */
@@ -51,7 +51,7 @@ new Ext.test.testSuite({
 });
 
 
-new Ext.test.testCase({
+new Ext.test.TestCase({
   // the name of the testCase
    name : 'Test defaultValues, zIndex and disable'
   // Important automatically register testCase in Ext.test.session

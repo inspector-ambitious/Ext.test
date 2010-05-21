@@ -1,7 +1,7 @@
 Ext.ns('Ext.ux');
 /**
  * @class Ext.ux.bootMask
- * Georges Booting Body Mask
+ * A Sample Mask Extend
  * @extends Ext.LoadMask
  */
 Ext.ux.bootMask = Ext.extend(Ext.LoadMask,{

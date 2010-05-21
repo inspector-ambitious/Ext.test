@@ -1,4 +1,4 @@
-new Ext.test.testSuite({
+new Ext.test.TestSuite({
   /* testSuite name */
     name : 'Nested Test Suites Sample 3'	 
   , items : [{
