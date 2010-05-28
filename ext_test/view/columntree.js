@@ -4,8 +4,8 @@
  * Based on Ext.ux.tree.ColumnTree sample.
  * @extends Ext.tree.TreePanel
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1
- * @date	May 21, 2010
+ * @version 1.1.1
+ * @date	May 28, 2010
  */
 Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
     useArrows: true,
@@ -78,6 +78,15 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
         this.mon(Ext.test.session, 'registersuite', function(s, ts) {
             this.addSuiteNode(ts);
         }, this);
+        this.mon(Ext.test.session, 'addtestobject', function(s, ts, to) {
+            var n = this.getSuiteNode(ts.name);
+            if (to instanceof Y.Test.Case){
+                this.addCaseNode(to, n);
+            }
+            if (to instanceof Y.Test.Suite){
+                this.addSuiteNode(to, n);
+            }
+        }, this);
         this.mon(Ext.test.session, 'registercase', function(s, tc) {
             this.addCaseNode(tc);
         }, this);
@@ -122,11 +131,11 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
         // prevent floats from wrapping when clipped
         this.colheaders.setWidth('auto');;
     },
-  /**
-   * Get an Ext.test.TestCase Node by it's name.
-   * @param {String} name The name of the Ext.test.TestCase
-   * @return {Ext.tree.TreeNode} The node or undefined
-   */
+	/**
+	 * Gets an Ext.test.TestCase node by its name.
+	 * @param {String} name The name of the Ext.test.TestCase
+	 * @return {Ext.tree.TreeNode} The node, or undefined.
+	 */
     getCaseNode: function(name) {
         var n,
         attr;
@@ -139,11 +148,11 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
         }, this);
         return n;
     },
-  /**
-   * Get a TestSuite Node by it's name.
-   * @param {String} name The name of the TestSuite
-   * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode or undefined
-   */
+	/**
+	 * Gets a TestSuite node by its name.
+	 * @param {String} name The name of the TestSuite
+	 * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode, or undefined
+	 */
     getSuiteNode: function(name) {
         var n,
         attr;
@@ -176,11 +185,11 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
             }
         }, this);
     },
-  /**
-   * Create an Ext.test.TestSuite Node.
-   * @param {Ext.test.TestSuite} ts The TestSuite
-   * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode
-   */
+	/**
+	 * Creates an Ext.test.TestSuite node.
+	 * @param {Ext.test.TestSuite} ts The TestSuite
+	 * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode
+	 */
     createSuiteNode: function(ts) {
         return new Ext.tree.TreeNode({
             name: ts.name,
@@ -193,11 +202,11 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
             errors: ''
         });
     },
-  /**
-   * Create an Ext.test.TestSuite Node and add to a Parent Ext.tree.TreeNode.
-   * @param {Ext.test.TestSuite} ts The Ext.test.TestSuite
-   * @param {Ext.tree.TreeNode} pnode The parent Node
-   */
+	/**
+	 * Creates an Ext.test.TestSuite node and adds it to a parent Ext.tree.TreeNode.
+	 * @param {Ext.test.TestSuite} ts The Ext.test.TestSuite
+	 * @param {Ext.tree.TreeNode} pnode The parent node
+	 */
     addSuiteNode: function(ts, pnode) {
         pnode = pnode || this.root;
         var oldn = this.getSuiteNode(ts.name);
@@ -206,24 +215,12 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
         }
         var n = this.createSuiteNode(ts);
         pnode.appendChild(n);
-        var items = ts.items;
-        var len = items.length;
-        var it;
-        for (var i = 0; i < len; i++) {
-            it = items[i];
-            if (it instanceof Y.Test.Case) {
-                this.addCaseNode(it, n);
-            }
-            if (it instanceof Y.Test.Suite) {
-                this.addSuiteNode(it, n);
-            }
-        }
     },
-  /**
-   * Create a Ext.test.TestCaseNode.
-   * @param {Ext.test.TestCase} tc the TestCase
-   * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode
-   */
+	/**
+	 * Creates an Ext.test.TestCaseNode.
+	 * @param {Ext.test.TestCase} tc The TestCase
+	 * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode
+	 */
     createCaseNode: function(tc) {
         return new Ext.tree.TreeNode({
             name: tc.name,
@@ -236,11 +233,11 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
             errors: ''
         });
     },
-  /**
-   * Create an Ext.test.TestCase Node and add to a parent Ext.tree.TreeNode.
-   * @param {Ext.test.TestCase} ts The Ext.test.TestCase
-   * @param {Ext.tree.TreeNode} pnode The parent Ext.tree.TreeNode
-   */
+	/**
+	 * Creates an Ext.test.TestCase node and adds it to a parent Ext.tree.TreeNode.
+	 * @param {Ext.test.TestCase} ts The Ext.test.TestCase
+	 * @param {Ext.tree.TreeNode} pnode The parent Ext.tree.TreeNode
+	 */
     addCaseNode: function(tc, pnode) {
         pnode = pnode || this.root;
         var n = this.createCaseNode(tc);

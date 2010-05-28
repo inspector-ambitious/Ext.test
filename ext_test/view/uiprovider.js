@@ -1,11 +1,11 @@
 /**
  * @class Ext.test.view.uiProvider
- * A ColumnNodeUI that with refresh support and icon change.
+ * A ColumnNodeUI with refresh support and icon changing capability.
  * Based Ext.ux.tree.ColumnNodeUI ExtJS 3.2.1 sample.
  * @extends Ext.tree.TreeNodeUI
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1
- * @date	May 21, 2010
+ * @version 1.1.1
+ * @date	May 28, 2010
  */
 Ext.test.view.uiProvider = Ext.extend(Ext.tree.TreeNodeUI, {
     focus: Ext.emptyFn, // prevent odd scrolling behavior
@@ -57,7 +57,7 @@ Ext.test.view.uiProvider = Ext.extend(Ext.tree.TreeNodeUI, {
         this.textNode = cs[3].firstChild;
     },
   /**
-   * Refresh Node Html Element.
+	 * Refreshes the node's HTML element.
    */
     refresh: function() {
         var n = this.node;
@@ -78,10 +78,10 @@ Ext.test.view.uiProvider = Ext.extend(Ext.tree.TreeNodeUI, {
             cells[i].firstChild.innerHTML = v;
         }
     },
-  /**
-   * Set Node icon class.
-   * @param {String} className The name of the class
-   */
+	/**
+	 * Sets the node's CSS icon class.
+	 * @param {String} className The name of the CSS class.
+	 */
     setIconElClass: function(className) {
         var n = this.node;
         if (!n.rendered) {

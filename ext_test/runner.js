@@ -3,77 +3,88 @@
  * An Observable that manage the YUI Test Runner
  * @extends Ext.util.Observable
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1
- * @date	May 21, 2010
+ * @version 1.1.1
+ * @date	May 28, 2010
  */
 Ext.test.Runner = Ext.extend(Ext.util.Observable, {
     constructor: function() {
         Ext.test.Runner.superclass.constructor.apply(this, arguments);
-         /**
-           * @event beforebegin
-           * Fires before test runner begin.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event begin
-           * Fires when test runner begin.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event complete
-           * Fires when test runner has finished.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event pass
-           * Fires when testCase pass.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event fail
-           * Fires when testCase fail.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event ignore
-           * Fires when testCase is ignored.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event testcasebegin
-           * Fires when a testCase begin.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event testcasecomplete
-           * Fires when a testCase has finished.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event testsuitebegin
-           * Fires when a testSuite begin.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-          /**
-           * @event testsuitecomplete
-           * Fires when a testSuite has finished.
-           * @param {Ext.test.Runner} runner This Ext.test.Runner object.
-           * @param {EventObject} event The runner event.
-           */
-        this.addEvents('beforebegin', 'begin', 'complete', 'pass', 'fail', 'ignore', 'testcasebegin', 'testcasecomplete', 'testsuitebegin', 'testsuitecomplete');
+		    this.addEvents(
+			    /**
+			     * @event beforebegin
+			     * Fires before the test runner begins.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'beforebegin',
+			    /**
+			     * @event begin
+			     * Fires when the test runner begins.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'begin',
+			    /**
+			     * @event complete
+			     * Fires when the test runner has finished.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'complete',
+			    /**
+			     * @event pass
+			     * Fires when a TestCase passes.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'pass',
+			    /**
+			     * @event fail
+			     * Fires when a TestCase fails.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'fail',
+			    /**
+			     * @event ignore
+			     * Fires when a TestCase is ignored.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'ignore',
+			    /**
+			     * @event testcasebegin
+			     * Fires when a TestCase begins.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'testcasebegin',
+			    /**
+			     * @event testcasecomplete
+			     * Fires when a TestCase has finished.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'testcasecomplete',
+			    /**
+			     * @event testsuitebegin
+			     * Fires when a TestSuite begins.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'testsuitebegin',
+			    /**
+			     * @event testsuitecomplete
+			     * Fires when a TestSuite has finished.
+			     * @param {Ext.test.Runner} runner This Ext.test.Runner object.
+			     * @param {EventObject} event The runner event.
+			     */
+			    'testsuitecomplete'
+		    );
         this.monitorYUITestRunner();
         this.monitorTestSession();
     },
-    // YUI TestRunner event hooks
+    // YUI TestRunner events
     monitorYUITestRunner: function() {
         var r = Y.Test.Runner;
         var fn = this.onTestRunnerEvent;
@@ -91,13 +102,13 @@ Ext.test.Runner = Ext.extend(Ext.util.Observable, {
     // handle YUI TestRunner events
     onTestRunnerEvent: function(e) {
         var type = e.type;
-        // yui 3 test Master Suite event drop
+        // Master Suite event drop
         if (type == 'testsuitebegin' && e.testSuite.name == this.runner.getName()){
             return;
         }
         this.fireEvent(type, this, e);
     },
-    // Monitor Ext.test.session
+    // Monitor a Ext.test.session
     monitorTestSession: function(){
         this.regs = new Ext.util.MixedCollection();
         Ext.test.session.on('registersuite', this.register, this);
@@ -108,15 +119,28 @@ Ext.test.Runner = Ext.extend(Ext.util.Observable, {
         this.regs.add(t.name, t);
     },
     /**
-     * Run registered testCase and testSuites.
+     * Runs registered testCases and testSuites.
      */
     run: function() {
         this.fireEvent('beforebegin', this);
-        this.runner.clear();
+        //this.clear();
         this.regs.each(function(r) {
-            this.runner.add(r);
-        }, this);
-        this.runner.run();
+            this.add(r);
+        }, this.runner);
+        this.runner.run(true);
+    },
+    /**
+     * Removes all test objects. 
+     */
+    clear: function(){
+      this.runner.clear();
+    },
+    /**
+     * Unsubscribe runner events and purge all listeners in Ext.test.runner. 
+     */
+    destroy: function() {
+      this.runner.unsubscribeAll();
+      this.purgeListeners();
     }
 });
 Ext.test.runner = new Ext.test.Runner();
