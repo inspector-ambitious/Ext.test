@@ -3,10 +3,15 @@
  * An Observable that manage the YUI Test Runner
  * @extends Ext.util.Observable
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.Runner = Ext.extend(Ext.util.Observable, {
+  /**
+	 * @cfg {Ext.test.Session} testSession (defaults to Ext.test.session) The 
+	 * default instanciated Ext.test.Session used by this Ext.test.runner.
+	 */
+    testSession: Ext.test.session,
     constructor: function() {
         Ext.test.Runner.superclass.constructor.apply(this, arguments);
 		    this.addEvents(
@@ -82,7 +87,6 @@ Ext.test.Runner = Ext.extend(Ext.util.Observable, {
 			    'testsuitecomplete'
 		    );
         this.monitorYUITestRunner();
-        this.monitorTestSession();
     },
     // YUI TestRunner events
     monitorYUITestRunner: function() {
@@ -108,25 +112,13 @@ Ext.test.Runner = Ext.extend(Ext.util.Observable, {
         }
         this.fireEvent(type, this, e);
     },
-    // Monitor a Ext.test.session
-    monitorTestSession: function(){
-        this.regs = new Ext.util.MixedCollection();
-        Ext.test.session.on('registersuite', this.register, this);
-        Ext.test.session.on('registercase', this.register, this);
-    },
-    // handle Ext.test.session test registering
-    register: function(s, t) {
-        this.regs.add(t.name, t);
-    },
     /**
      * Runs registered testCases and testSuites.
      */
     run: function() {
         this.fireEvent('beforebegin', this);
-        //this.clear();
-        this.regs.each(function(r) {
-            this.add(r);
-        }, this.runner);
+        var master_suite = this.testSession.getMasterSuite();
+        this.runner.add(master_suite);
         this.runner.run(true);
     },
     /**

@@ -3,8 +3,8 @@
  * A Console that show Ext.test.runner events.
  * @extends Ext.grid.GridPanel
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.view.Logger = Ext.extend(Ext.grid.GridPanel, {
     autoWidth: true,

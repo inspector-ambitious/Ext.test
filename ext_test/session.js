@@ -3,22 +3,10 @@
  * The Test Session Class. 
  * @extends Ext.util.Observable
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.Session = Ext.extend(Ext.util.Observable, {
-   /**
-     * @property ts
-     * A MixedCollection of instancied Ext.test.TestSuite's.
-     * @type Ext.util.MixedCollection
-     */
-    ts: new Ext.util.MixedCollection(),
-   /**
-     * @property tc
-     * A MixedCollection of instancied Ext.test.TestCase's.
-     * @type Ext.util.MixedCollection
-     */
-    tc: new Ext.util.MixedCollection(),
     // Add some events
     constructor: function() {
         Ext.test.Session.superclass.constructor.apply(this, arguments);
@@ -30,15 +18,6 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
 			     * @param {Ext.test.TestSuite} tsuite The Ext.test.TestSuite.
 			     */
         'registersuite',
-      	/**
-		     * @event addtestobject
-		     * Fires when an Ext.test.TestCase or an Ext.test.TestSuite is added to 
-		     * this Ext.test.TestSuite.
-		     * @param {Ext.test.Session} session This Ext.test.Session instanciated object.
-		     * @param {Ext.test.TestSuite} testsuite This Ext.test.TestSuite object.
-		     * @param {Ext.test.TestSuite} testcase The added Ext.test.TestCase.
-		     */  
-        'addtestobject',
         	/**
 			     * @event registercase
 			     * Fires after a Ext.test.TestCase is registered in this Ext.test.Session.
@@ -46,6 +25,14 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
 			     * @param {Ext.test.TestCase} tsuite The Ext.test.TestCase.
 			     */
         'registercase');
+        this.buildMasterSuite();
+    },
+    buildMasterSuite: function(){
+      this.masterSuite = new Ext.test.TestSuite({
+        name: document.title,
+        disableRegister: true,
+        testSession: this
+      });
     },
 	/**
 	 * Gets an existing Ext.test.TestSuite by name, or create it if it doesn't exist yet.
@@ -75,37 +62,30 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
 	 * @return {Ext.test.TestSuite} The Ext.test.TestSuite, or null if the TestSuite is not registered.
 	 */
     findSuite: function(name) {
-        return this.ts.get(name);
+        var tsuite;
+        this.masterSuite.cascade(function(t){
+          if (t instanceof Ext.test.TestSuite && t.name == name){
+            tsuite = t;
+            return false;
+          }
+        },this);
+        return tsuite;
     },
 	/**
 	 * Registers an Ext.test.TestSuite into this session.
 	 * @param {Ext.test.TestSuite} testSuite The TestSuite to register.
 	 */
     registerSuite: function(testSuite) {
-        var name = testSuite.name;
-        if (this.ts.indexOf(name) == -1) {
-            this.ts.add(name, testSuite);
-        }
-        this.fireEvent('registersuite', this, testSuite);
-    },
-    addTestObject: function (testSuite, testObject){
-        if (testObject instanceof Y.Test.Suite){
-          if (this.ts.indexOf(testObject.name) != -1) {
-              this.ts.remove(testObject);
-          }
-        }
-        this.fireEvent('addtestobject', this, testSuite, testObject);
+       this.masterSuite.add(testSuite);
+       this.fireEvent('registersuite', this, testSuite);
     },
 	/**
 	 * Registers an Ext.test.TestCase into this session.
 	 * @param {Ext.test.TestCase} testCase The TestCase to register.
 	 */
     registerCase: function(testCase) {
-        var name = testCase.name;
-        if (this.tc.indexOf(name) == -1) {
-            this.tc.add(name, testCase);
-        }
-        this.fireEvent('registercase', this, testCase);
+       this.masterSuite.add(testCase);
+       this.fireEvent('registercase', this, testCase);
     },
 	/**
 	 * Finds an Ext.test.TestCase by name.
@@ -113,7 +93,14 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
 	 * @return {Ext.test.TestCase} The Ext.test.TestCase, or null if the TestCase is not registered.
 	 */
     findCase: function(name) {
-        return this.ts.get(name);
+        var tcase;
+        this.masterSuite.cascade(function(t){
+          if (t instanceof Ext.test.TestCase && t.name == name){
+            tcase = t;
+            return false;
+          }
+        },this);
+        return tcase;
     },
 	/**
 	 * Adds a Ext.test.TestCase to this Ext.test.Session, adding it to a TestSuite. Accepts 
@@ -130,32 +117,27 @@ Ext.test.Session = Ext.extend(Ext.util.Observable, {
 	 * @return {Number} The number of TestCases.
 	 */
     getTestCaseCount: function() {
-        var c = 0;
-        this.ts.each(function(t){
-            c += t.getTestCaseCount();
-        },this);
-        c += this.tc.getCount();
-        return c;
+        return this.masterSuite.getTestCaseCount();
     },
 	/**
 	 * Gets the number of registered Ext.test.TestSuite's in this Ext.test.Session.
 	 * @return {Number} The number of TestSuites.
 	 */
     getTestSuiteCount: function() {
-        var c = 0;
-        this.ts.each(function(t){
-            c += (t.getTestSuiteCount() + 1);
-        },this);
-        return c;
+        return this.masterSuite.getTestSuiteCount();
     },
 	/**
 	 * Destroys the Ext.test.Session.
 	 */
     destroy: function(){
-       this.ts.clear();
-       this.tc.clear();
-       this.purgeListeners()
+        this.purgeListeners()
+    },
+   /**
+	 * Gets the Ext.test.Session MasterSuite.
+	 * @return {Ext.test.TestSuite} The Masteer Ext.test.TestSuite.
+	 */
+    getMasterSuite: function(){
+        return this.masterSuite;
     }
 });
-
 Ext.test.session = new Ext.test.Session();

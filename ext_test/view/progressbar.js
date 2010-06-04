@@ -3,8 +3,8 @@
  * A progress bar that shows the state of the Ext.test.TestRunner.
  * @extends Ext.ProgressBar
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.view.ProgressBar = Ext.extend(Ext.ProgressBar,{
     // the number of test cases already run

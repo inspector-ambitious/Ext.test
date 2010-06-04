@@ -3,8 +3,8 @@
  * TestSuite class.
  * @extends Y.Test.Case
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.TestSuite = Ext.extend(Y.Test.Suite, {
 	/**
@@ -18,19 +18,17 @@ Ext.test.TestSuite = Ext.extend(Y.Test.Suite, {
 	 * @cfg {Object} defaults (defaults to {}) The defaults methods or properties 
 	 * to apply to children Ext.test.TestCase.
 	 */
-    defaults: {},
-  /**
+	/**
 	 * @cfg {Ext.test.Session} testSession (defaults to Ext.test.session) The 
 	 * default instanciated Ext.test.Session where the Ext.test.TestCase register.
 	 */
-    testSession: Ext.test.session,
+    defaults: {},
+    disableRegister: false,
     constructor: function(config) {
         Ext.apply(this, config);
         Ext.test.TestSuite.superclass.constructor.apply(this, arguments);
-        if (this.parentSuite){
-            this.testSession = this.parentSuite.testSession;
-            this.testSession.addTestObject(this.parentSuite, this);
-        } else {
+        this.testSession = this.testSession || Ext.test.session;  
+        if (!this.parentSuite && !this.disableRegister) {
             this.testSession.registerSuite(this);
         }
         this.initItems();
@@ -51,7 +49,6 @@ Ext.test.TestSuite = Ext.extend(Y.Test.Suite, {
                 this.add(tc);
             }
         }
-        console.log(this);
     },
 	/**
 	 * Adds an Ext.test.TestCase or Ext.test.TestSuite to this TestSuite, and
@@ -62,12 +59,11 @@ Ext.test.TestSuite = Ext.extend(Y.Test.Suite, {
     add: function(item) {
         var it = item;
             it.parentSuite = this;
-        if (! (item instanceof Y.Test.Case) && ! (item instanceof Y.Test.Suite)) {
+        if (! (item instanceof Ext.test.TestCase) && ! (item instanceof Ext.test.TestSuite)) {
             if (it.ttype == 'testsuite') {
                 it = new Ext.test.TestSuite(item);
             } else {
                 it = new Y.Test.Case(item);
-                this.testSession.addTestObject(this, it);
             }
         }
         Ext.test.TestSuite.superclass.add.call(this, it);
@@ -102,12 +98,42 @@ Ext.test.TestSuite = Ext.extend(Y.Test.Suite, {
             it;
         for (var i = 0; i < len; i++){
             it = items[i];
-            if (it instanceof Y.Test.Case){
+            if (it instanceof Ext.test.TestCase){
                 c++;
             } else if (it instanceof Ext.test.TestSuite){
                 c += it.getTestCaseCount();
             }
         }
         return c;
+    },
+  /**
+	 * Cascades down the Ext.test.TestSuite tree from this Ext.test.TestSuite, 
+	 * calling the specified function with each item. 
+	 * If the function returns false at any point, the cascade is stopped on that branch.
+	 * @param {function} The function to call
+	 * @param {Ext.test.TestSuite/Ext.test.TestCase}(optional) The scope (this reference) in which the function is executed. Defaults to the current TestObject.
+	 */
+    cascade: function(fn,scope){
+        var items = this.items,
+            len = items.length,
+            it;
+        scope = scope || this;
+        var res = fn.call(scope, this);
+        if (res == false){
+          return;
+        }
+        for (var i = 0; i < len; i++){
+            it = items[i];
+            if (it instanceof Ext.test.TestSuite){
+                res = it.cascade(fn,scope);
+                if (res == false){
+                  return;
+                }
+            } else {
+              fn.call(scope,it);
+            }
+        }
     }
 });
+// Ext 3.2.1 Unit Tests Compatibility
+Y.Test.Suite = Ext.test.TestSuite;

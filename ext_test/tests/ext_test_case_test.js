@@ -2,6 +2,7 @@ new Ext.test.TestSuite({
 	  name: 'Ext.test.TestCase',
 	  defaults: {
 	      configTestCase : {},
+	      // call before each tests
         setUp: function() {
             this.testSession = new Ext.test.Session();
             var conf = Ext.apply(this.configTestCase, {
@@ -9,6 +10,7 @@ new Ext.test.TestSuite({
             });
             this.testCase = new Ext.test.TestCase(conf);
 		    }, 
+		    // call after each tests
 	  		tearDown: function() {
             this.testSession.destroy();
             delete this.testSession;
@@ -17,19 +19,10 @@ new Ext.test.TestSuite({
 	  },
     items: [{
         name : 'Default configuration after instanciation',
+        // test is Ext.test.TestCase is correctly instanciated
         testDefaultConfiguration: function() {
-            Y.Assert.isFalse(this.testCase.autoReg, 'testCase: autoReg');
             Y.Assert.isString(this.testCase.name, 'testCase: name');
             Y.ObjectAssert.areEqual(this.testSession, this.testCase.testSession, 'testCase: testSession');
         }
-       },{
-        name: 'Constructor.',
-        configTestCase: {
-            autoReg: true
-        },
-        testSessionRegister: function() {
-            var idx = this.testSession.tc.indexOf(this.testCase);
-            Y.Assert.areNotSame(-1, idx, 'testCase: is registered');
-        }
-    }]
+       }]
 });

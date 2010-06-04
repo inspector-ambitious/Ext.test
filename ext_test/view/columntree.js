@@ -4,8 +4,8 @@
  * Based on Ext.ux.tree.ColumnTree sample.
  * @extends Ext.tree.TreePanel
  * @author  Nicolas FERRERO (aka yhwh) for Sylogix
- * @version 1.1.1
- * @date	May 28, 2010
+ * @version 1.3
+ * @date	June 4, 2010
  */
 Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
     useArrows: true,
@@ -15,12 +15,16 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
     autoScroll: true,
     rootVisible: false,
     lines : false,
+  /**
+	 * @cfg {Ext.test.Session} testSession (defaults to Ext.test.session) The 
+	 * default instanciated Ext.test.Session used by this Ext.test.runner.
+	 */
     borderWidth : Ext.isBorderBox ? 0 : 2, // the combined left/right border for each cell
     cls : 'x-column-tree',
     initComponent: function() {
+        this.testSession = this.testSession || Ext.test.session;  
         this.createRootNode();
         this.configureColumns();
-        this.monitorTestSession();
         this.monitorTestRunner();
         Ext.test.view.ColumnTree.superclass.initComponent.apply(this, arguments);
     },
@@ -73,24 +77,6 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
             width: 50
         }];
     },
-    // monitor test session
-    monitorTestSession: function(){
-        this.mon(Ext.test.session, 'registersuite', function(s, ts) {
-            this.addSuiteNode(ts);
-        }, this);
-        this.mon(Ext.test.session, 'addtestobject', function(s, ts, to) {
-            var n = this.getSuiteNode(ts.name);
-            if (to instanceof Y.Test.Case){
-                this.addCaseNode(to, n);
-            }
-            if (to instanceof Y.Test.Suite){
-                this.addSuiteNode(to, n);
-            }
-        }, this);
-        this.mon(Ext.test.session, 'registercase', function(s, tc) {
-            this.addCaseNode(tc);
-        }, this);
-    },
     // monitor test runner
     monitorTestRunner: function(){
         var fn = this.onTestRunnerEvent;
@@ -129,7 +115,8 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
             cls: 'x-clear'
         });
         // prevent floats from wrapping when clipped
-        this.colheaders.setWidth('auto');;
+        this.colheaders.setWidth('auto');
+        this.createTree();
     },
 	/**
 	 * Gets an Ext.test.TestCase node by its name.
@@ -190,11 +177,12 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
 	 * @param {Ext.test.TestSuite} ts The TestSuite
 	 * @return {Ext.tree.TreeNode} The Ext.tree.TreeNode
 	 */
-    createSuiteNode: function(ts) {
+    createSuiteNode: function(ts, expanded) {
         return new Ext.tree.TreeNode({
             name: ts.name,
             uiProvider: Ext.test.view.uiProvider,
             type: 'testSuite',
+            expanded: expanded,
             state: '',
             passed: '',
             failed: '',
@@ -207,13 +195,13 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
 	 * @param {Ext.test.TestSuite} ts The Ext.test.TestSuite
 	 * @param {Ext.tree.TreeNode} pnode The parent node
 	 */
-    addSuiteNode: function(ts, pnode) {
+    addSuiteNode: function(ts, pnode, expanded) {
         pnode = pnode || this.root;
         var oldn = this.getSuiteNode(ts.name);
         if (oldn) {
             oldn.remove(true);
         }
-        var n = this.createSuiteNode(ts);
+        var n = this.createSuiteNode(ts, expanded);
         pnode.appendChild(n);
     },
 	/**
@@ -294,7 +282,29 @@ Ext.test.view.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
               node.ui.refresh();
               break;
         }
+    },
+    // private create tree for Ext.test.session
+    createTree: function(){
+      var ms = this.testSession.getMasterSuite();
+      ms.cascade(function(t){
+         if (t === ms){ 
+            this.addSuiteNode(ms, this.root, true);
+         } else if (!t.parentSuite){
+             if (t instanceof Ext.test.TestCase){
+                this.addCaseNode(t);
+             } else {
+                this.addSuiteNode(t);
+             }
+         } else {
+             var sn = this.getSuiteNode(t.parentSuite.name);
+             if (t instanceof Ext.test.TestCase){
+                this.addCaseNode(t,sn);
+             } else {
+                this.addSuiteNode(t,sn);
+             }
+         }
+      },this);
+
     }
 });
-
 Ext.reg('testtree', Ext.test.view.ColumnTree);

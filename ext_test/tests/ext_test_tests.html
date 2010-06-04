@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Ext.test 1.1.1 Tests</title>
+		<title>Ext.test 1.3 Tests</title>
 
 <!--
     EXTJS 3.2.1
@@ -42,10 +42,10 @@
 
     <script type="text/javascript" src="../yuitest_hooks.js"></script>
     <script type="text/javascript" src="../namespace.js"></script>
-    <script type="text/javascript" src="../session.js"></script>
-    <script type="text/javascript" src="../runner.js"></script>
     <script type="text/javascript" src="../testsuite.js"></script>
     <script type="text/javascript" src="../testcase.js"></script>
+    <script type="text/javascript" src="../session.js"></script>
+    <script type="text/javascript" src="../runner.js"></script>
     <script type="text/javascript" src="../view/namespace.js"></script>
     <script type="text/javascript" src="../view/startbutton.js"></script>
     <script type="text/javascript" src="../view/progressbar.js"></script>
@@ -63,7 +63,6 @@
         });
         var viewer = new Ext.test.view.ColumnTree({
             region: 'center',
-            title: document.title,
             height: 350,
             tbar: [{
                 xtype: 'teststartbutton'
@@ -87,8 +86,9 @@
 <!--
     TESTS
 -->
-    <script type="text/javascript" src="testcase_test.js"></script>
-    <script type="text/javascript" src="testsuite_test.js"></script>
+    <script type="text/javascript" src="ext_test_case_test.js"></script>
+    <script type="text/javascript" src="ext_test_suite_test.js"></script>
+    <script type="text/javascript" src="ext_test_session_test.js"></script>
 <!--
     END OF TESTS
 -->
